@@ -6,7 +6,7 @@
 npm i -g nger-build
 ```
 
-## 打包
+## build
 ```ts
 nger-build
 ```
