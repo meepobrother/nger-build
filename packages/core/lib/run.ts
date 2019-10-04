@@ -3,10 +3,10 @@ import { createProject } from 'gulp-typescript';
 import { join } from 'path';
 export interface RunOptions {
     src: string;
-    output: string;
-    types: string;
     tsconfig: string;
-    watch: boolean;
+    output?: string;
+    types?: string;
+    watch?: boolean;
 }
 function fromEvent(event: any) {
     return new Promise((resolve, reject) => {
@@ -17,9 +17,10 @@ function fromEvent(event: any) {
 }
 export function run(options: RunOptions) {
     const tsProject = createProject(options.tsconfig);
+    const output: string = options.output || 'dist';
     const inputs = [
         join(options.src, '**/*.ts'),
-        `!${join(options.src, options.output)}/**/*`,
+        `!${join(options.src, output)}/**/*`,
         `!${join(options.src, '__tests__')}/**/*`,
         `!${join(options.src, '/**/__tests__')}/**/*`,
         `!${join(options.src, 'node_modules')}/**/*`,
@@ -29,8 +30,8 @@ export function run(options: RunOptions) {
         console.log(`compiling...`)
         const tsResult = gulp.src(inputs)
             .pipe(tsProject())
-        const js = tsResult.js.pipe(gulp.dest(options.output));
-        const dts = tsResult.dts.pipe(gulp.dest(options.types));
+        const js = tsResult.js.pipe(gulp.dest(output));
+        const dts = tsResult.dts.pipe(gulp.dest(options.types || output));
         Promise.all([fromEvent(js), fromEvent(dts)]).then(res => {
             done && done();
         })
@@ -51,7 +52,7 @@ export function run(options: RunOptions) {
             `!${join(options.src, `${options.output}/**/*`)}`,
         ]
         fromEvent(gulp.src(inputs).pipe(
-            gulp.dest(options.output)
+            gulp.dest(output)
         )).then(() => {
             done && done();
         });
