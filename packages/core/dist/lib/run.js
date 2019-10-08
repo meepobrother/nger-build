@@ -15,9 +15,10 @@ function fromEvent(event) {
 }
 function run(options) {
     var tsProject = gulp_typescript_1.createProject(options.tsconfig);
+    var output = options.output || 'dist';
     var inputs = [
-        path_1.join(options.src, '**/*.ts'),
-        "!" + path_1.join(options.src, options.output) + "/**/*",
+        path_1.join(options.src, '/**/*.ts'),
+        "!" + path_1.join(options.src, output) + "/**/*",
         "!" + path_1.join(options.src, '__tests__') + "/**/*",
         "!" + path_1.join(options.src, '/**/__tests__') + "/**/*",
         "!" + path_1.join(options.src, 'node_modules') + "/**/*",
@@ -27,8 +28,8 @@ function run(options) {
         console.log("compiling...");
         var tsResult = gulp_1.default.src(inputs)
             .pipe(tsProject());
-        var js = tsResult.js.pipe(gulp_1.default.dest(options.output));
-        var dts = tsResult.dts.pipe(gulp_1.default.dest(options.types));
+        var js = tsResult.js.pipe(gulp_1.default.dest(output));
+        var dts = tsResult.dts.pipe(gulp_1.default.dest(options.types || output));
         Promise.all([fromEvent(js), fromEvent(dts)]).then(function (res) {
             done && done();
         });
@@ -48,7 +49,7 @@ function run(options) {
             "!" + path_1.join(options.src, '/**/node_modules') + "/**/*",
             "!" + path_1.join(options.src, options.output + "/**/*"),
         ];
-        fromEvent(gulp_1.default.src(inputs).pipe(gulp_1.default.dest(options.output))).then(function () {
+        fromEvent(gulp_1.default.src(inputs).pipe(gulp_1.default.dest(output))).then(function () {
             done && done();
         });
     });

@@ -19,7 +19,7 @@ export function run(options: RunOptions) {
     const tsProject = createProject(options.tsconfig);
     const output: string = options.output || 'dist';
     const inputs = [
-        join(options.src, '**/*.ts'),
+        join(options.src, '/**/*.ts'),
         `!${join(options.src, output)}/**/*`,
         `!${join(options.src, '__tests__')}/**/*`,
         `!${join(options.src, '/**/__tests__')}/**/*`,
