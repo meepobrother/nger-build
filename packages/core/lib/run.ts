@@ -27,7 +27,7 @@ export function run(options: RunOptions) {
         `!${join(options.src, '/**/node_modules')}/**/*`
     ];
     gulp.task("compiler", (done: any) => {
-        console.log(`compiling...`)
+        console.log(`i am compiling...`)
         const tsResult = gulp.src(inputs)
             .pipe(tsProject())
         const js = tsResult.js.pipe(gulp.dest(output));
@@ -37,11 +37,11 @@ export function run(options: RunOptions) {
         })
     });
     gulp.task("copy", (done: any) => {
-        console.log(`copy...`)
+        console.log(`i am copy...`)
         const inputs = [
             join(options.src, 'package.json'),
-            join(options.src, '*.md'),
-            join(options.src, '**/*.md'),
+            join(options.src, 'readme.md'),
+            join(options.src, 'README.md'),
             join(options.src, '**/*.json'),
             join(options.src, '**/*.graphql'),
             join(options.src, '**/*.proto'),
