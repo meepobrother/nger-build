@@ -5,8 +5,7 @@
         "sourceMap": true
     },
     "include": [
-        "lib",
-        "__tests__"
+        "lib"
     ],
     "exclude": [
         "node_modules"
