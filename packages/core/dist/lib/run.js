@@ -27,6 +27,7 @@ var gulp_1 = __importDefault(require("gulp"));
 var gulp_typescript_1 = require("gulp-typescript");
 var path_1 = require("path");
 var chokidar_1 = require("chokidar");
+var child_process_1 = require("child_process");
 function fromEvent(event) {
     return new Promise(function (resolve, reject) {
         event.on('end', function () {
@@ -40,7 +41,9 @@ function fromEvent(event) {
 function run(options) {
     var tsconfig = require(options.tsconfig);
     var output = options.output || 'dist';
-    var exclude = __spread(tsconfig.exclude.map(function (inc) { return "!" + path_1.join(options.src, inc, '**/*.ts'); }), tsconfig.exclude.map(function (inc) { return "!" + path_1.join(options.src, inc, '/**/*.ts'); }));
+    tsconfig.exclude = tsconfig.exclude || [];
+    tsconfig.include = tsconfig.include || [];
+    var exclude = __spread(tsconfig.exclude.map(function (inc) { return "!" + path_1.join(options.src, inc, '*.ts'); }), tsconfig.exclude.map(function (inc) { return "!" + path_1.join(options.src, inc, '/**/*.ts'); }));
     var tsFiles = [];
     tsconfig.include.map(function (inc) {
         tsFiles.push(path_1.join(options.src, inc, '*.ts'));
@@ -67,9 +70,6 @@ function run(options) {
             return fromEvent(src);
         });
         var inputs = [
-            path_1.join(options.src, 'package.json'),
-            path_1.join(options.src, 'readme.md'),
-            path_1.join(options.src, 'README.md'),
             "!" + path_1.join(options.src, '__tests__') + "/**/*",
             "!" + path_1.join(options.src, '/**/__tests__') + "/**/*",
             "!" + path_1.join(options.src, 'node_modules/**/*'),
@@ -77,6 +77,15 @@ function run(options) {
             "!" + path_1.join(options.src, options.output + "/**/*"),
             "!" + options.tsconfig
         ];
+        if (child_process_1.execFileSync(path_1.join(options.src, 'README.md'))) {
+            inputs.push(path_1.join(options.src, 'README.md'));
+        }
+        if (child_process_1.execFileSync(path_1.join(options.src, 'readme.md'))) {
+            inputs.push(path_1.join(options.src, 'readme.md'));
+        }
+        if (child_process_1.execFileSync(path_1.join(options.src, 'package.json'))) {
+            inputs.push(path_1.join(options.src, 'package.json'));
+        }
         incs.push(fromEvent(gulp_1.default.src(inputs).pipe(gulp_1.default.dest(output))).catch(function (e) { return done && done(e); }));
         Promise.all(incs).then(function () {
             done && done();

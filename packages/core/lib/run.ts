@@ -2,6 +2,7 @@ import gulp from 'gulp';
 import { createProject } from 'gulp-typescript';
 import { join } from 'path';
 import { watch } from 'chokidar';
+import { execFileSync } from 'child_process';
 export interface RunOptions {
     src: string;
     tsconfig: string;
@@ -22,8 +23,10 @@ function fromEvent(event: any) {
 export function run(options: RunOptions) {
     const tsconfig = require(options.tsconfig);
     const output: string = options.output || 'dist';
+    tsconfig.exclude = tsconfig.exclude || [];
+    tsconfig.include = tsconfig.include || [];
     const exclude = [
-        ...tsconfig.exclude.map((inc: string) => `!${join(options.src, inc, '**/*.ts')}`),
+        ...tsconfig.exclude.map((inc: string) => `!${join(options.src, inc, '*.ts')}`),
         ...tsconfig.exclude.map((inc: string) => `!${join(options.src, inc, '/**/*.ts')}`),
     ];
     const tsFiles: string[] = [];
@@ -61,9 +64,6 @@ export function run(options: RunOptions) {
             return fromEvent(src)
         });
         const inputs = [
-            join(options.src, 'package.json'),
-            join(options.src, 'readme.md'),
-            join(options.src, 'README.md'),
             `!${join(options.src, '__tests__')}/**/*`,
             `!${join(options.src, '/**/__tests__')}/**/*`,
             `!${join(options.src, 'node_modules/**/*')}`,
@@ -71,6 +71,15 @@ export function run(options: RunOptions) {
             `!${join(options.src, `${options.output}/**/*`)}`,
             `!${options.tsconfig}`
         ]
+        if (execFileSync(join(options.src, 'README.md'))) {
+            inputs.push(join(options.src, 'README.md'))
+        }
+        if (execFileSync(join(options.src, 'readme.md'))) {
+            inputs.push(join(options.src, 'readme.md'))
+        }
+        if (execFileSync(join(options.src, 'package.json'))) {
+            inputs.push(join(options.src, 'package.json'))
+        }
         incs.push(fromEvent(gulp.src(inputs).pipe(
             gulp.dest(output)
         )).catch(e => done && done(e)));

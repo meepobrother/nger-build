@@ -13,15 +13,19 @@ var pkg = require('../package.json');
 commander_1.default.version(pkg.version)
     .option("-c, --config <path>", '配置文件路径')
     .option("-w, --watch", '监听文件变化')
+    .option("-o, --output", '输出文件')
     .parse(process.argv);
 var path = commander_1.default.path;
+var root = process.cwd();
+var packageJson = require(path_1.join(root, 'package.json'));
+var output = path_1.join(commander_1.default.output || 'dist', packageJson.name);
 var defaultConfig = typescript_1.findConfigFile(process.cwd(), function (file) {
     return fs_1.existsSync(file);
 }) || path_1.join(process.cwd(), 'tsconfig.json');
 var options = {
     src: process.cwd(),
-    output: 'dist',
-    types: 'dist',
+    output: output,
+    types: output,
     tsconfig: defaultConfig,
     watch: !!commander_1.default.watch
 };

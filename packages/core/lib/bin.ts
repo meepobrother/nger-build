@@ -8,15 +8,20 @@ const pkg = require('../package.json')
 program.version(pkg.version)
     .option(`-c, --config <path>`, '配置文件路径')
     .option(`-w, --watch`, '监听文件变化')
+    .option(`-o, --output`, '输出文件')
     .parse(process.argv)
 const path = program.path;
+const root = process.cwd();
+const packageJson = require(join(root, 'package.json'))
+const output = join(program.output || 'dist', packageJson.name);
+
 const defaultConfig = findConfigFile(process.cwd(), (file: string) => {
     return existsSync(file);
 }) || join(process.cwd(), 'tsconfig.json')
 let options: RunOptions = {
     src: process.cwd(),
-    output: 'dist',
-    types: 'dist',
+    output: output,
+    types: output,
     tsconfig: defaultConfig,
     watch: !!program.watch
 };
