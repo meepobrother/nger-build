@@ -2,7 +2,7 @@ import gulp from 'gulp';
 import { createProject } from 'gulp-typescript';
 import { join } from 'path';
 import { watch } from 'chokidar';
-import { execFileSync } from 'child_process';
+import { existsSync } from 'fs';
 export interface RunOptions {
     src: string;
     tsconfig: string;
@@ -35,12 +35,13 @@ export function run(options: RunOptions) {
         tsFiles.push(join(options.src, inc, '**/*.ts'))
     });
     gulp.task("compiler", (done: any) => {
-        console.log(`i am compiling...`)
+        console.log(`i am compiling...`);
         const pros = tsconfig.include.map((inc: string) => {
             const tsProject = createProject(options.tsconfig);
             const tsResult = gulp.src([
                 join(options.src, inc, '*.ts'),
                 join(options.src, inc, '**/*.ts'),
+                `!${join(options.src, options.output || '')}`,
                 ...exclude
             ]).pipe(
                 tsProject()
@@ -68,20 +69,20 @@ export function run(options: RunOptions) {
             `!${join(options.src, '/**/__tests__')}/**/*`,
             `!${join(options.src, 'node_modules/**/*')}`,
             `!${join(options.src, '/**/node_modules')}/**/*`,
-            `!${join(options.src, `${options.output}/**/*`)}`,
+            `!${join(options.src, `${output}/**/*`)}`,
             `!${options.tsconfig}`
         ]
-        if (execFileSync(join(options.src, 'README.md'))) {
+        if (existsSync(join(options.src, 'README.md'))) {
             inputs.push(join(options.src, 'README.md'))
         }
-        if (execFileSync(join(options.src, 'readme.md'))) {
+        if (existsSync(join(options.src, 'readme.md'))) {
             inputs.push(join(options.src, 'readme.md'))
         }
-        if (execFileSync(join(options.src, 'package.json'))) {
+        if (existsSync(join(options.src, 'package.json'))) {
             inputs.push(join(options.src, 'package.json'))
         }
         incs.push(fromEvent(gulp.src(inputs).pipe(
-            gulp.dest(output)
+            gulp.dest(join(options.src, output))
         )).catch(e => done && done(e)));
         Promise.all(incs).then(() => {
             done && done();

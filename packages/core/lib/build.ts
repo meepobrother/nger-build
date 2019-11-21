@@ -5,5 +5,5 @@ run({
     output: 'dist',
     types: 'dist',
     tsconfig: join(__dirname, '../tsconfig.json'),
-    watch: true
+    watch: false
 });
