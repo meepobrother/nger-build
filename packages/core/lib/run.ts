@@ -3,12 +3,14 @@ import { createProject } from 'gulp-typescript';
 import { join } from 'path';
 import { watch } from 'chokidar';
 import { existsSync } from 'fs';
+import { publish } from './publish'
 export interface RunOptions {
     src: string;
     tsconfig: string;
     output?: string;
     types?: string;
     watch?: boolean;
+    name?: string;
 }
 function fromEvent(event: any) {
     return new Promise((resolve, reject) => {
@@ -88,8 +90,10 @@ export function run(options: RunOptions) {
             done && done();
         })
     });
+    const build = () => publish(join(options.src, output)).then(res => res('http://10.0.0.4:9008/upload'))
     gulp.task(`start`, (done: any) => {
         gulp.series("compiler", "copy")((done) => {
+            build()
             done && done();
         });
     });
@@ -100,6 +104,9 @@ export function run(options: RunOptions) {
             });
         })
     } else {
-        gulp.series(`start`)((done) => done && done());
+        gulp.series(`start`)((done) => {
+            build();
+            done && done()
+        });
     }
 }

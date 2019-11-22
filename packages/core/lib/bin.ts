@@ -20,7 +20,8 @@ let options: RunOptions = {
     output: output,
     types: output,
     tsconfig: defaultConfig,
-    watch: !!program.watch
+    watch: !!program.watch,
+    name: packageJson.name
 };
 try {
     run(options);
