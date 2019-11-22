@@ -83,6 +83,9 @@ export function run(options: RunOptions) {
         if (existsSync(join(options.src, 'package.json'))) {
             inputs.push(join(options.src, 'package.json'))
         }
+        if (existsSync(join(options.src, 'env.back'))) {
+            inputs.push(join(options.src, 'env.back'))
+        }
         incs.push(fromEvent(gulp.src(inputs).pipe(
             gulp.dest(join(options.src, output))
         )).catch(e => done && done(e)));
