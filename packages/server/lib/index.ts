@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { NestFactory } from '@nestjs/core';
 import { Module, Controller, Post, Body, Get } from '@nestjs/common';
 import { writeFileSync, ensureDirSync } from 'fs-extra';

@@ -5,7 +5,11 @@
 	"author": "imeepos <1037483576@qq.com>",
 	"homepage": "https://github.com/meepobrother/nger-build#readme",
 	"license": "ISC",
-	"main": "lib/server.js",
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
+	"bin": {
+		"nger-build-server": "lib/index.js"
+	},
 	"directories": {
 		"lib": "lib",
 		"test": "__tests__"
