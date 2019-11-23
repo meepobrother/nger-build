@@ -11,5 +11,5 @@ export function pack(path: string): {
     });
     const name = res.toString('utf8').replace('\n', '');
     const filename = join(path, name);
-    return { data: readFileSync(filename), name: filename }
+    return { data: readFileSync(filename), name }
 }
