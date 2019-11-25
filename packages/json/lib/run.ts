@@ -61,12 +61,14 @@ export function run(options: RunOptions) {
     if (options.watch) {
         watch(inputs).on('change', () => {
             copy().then(() => {
-                // return build();
-            });
+                return build();
+            })
         })
     } else {
-        copy().then(() => {
-            // return build();
-        });
+        try {
+            copy().then(() => {
+                return build();
+            })
+        } catch (e) { }
     }
 }

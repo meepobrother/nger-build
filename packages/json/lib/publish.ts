@@ -8,8 +8,14 @@ export async function publish(path: string) {
     return (url: string) => axios.post(url, {
         data: sub.data,
         name: sub.name,
-    }).catch().then(e => {
+    }).catch(e => {
+        console.log(`publish error ${e.message}`)
+        removeSync(join(path, sub.name))
+    }).then(e => {
         console.log(`nger-build success, http://10.0.0.4:9008/${sub.name}`)
+        removeSync(join(path, sub.name))
+    }).finally(() => {
+        console.log(`publish error`)
         removeSync(join(path, sub.name))
     });
 }

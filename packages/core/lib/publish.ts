@@ -9,8 +9,12 @@ export async function publish(path: string) {
             data: res.buffer,
             name: res.name,
             hash: res.hash
-        }).catch().then(e => {
-            console.log(`nger-build success, http://10.0.0.4:9008/${res.name} ${res.hash}`)
+        }).catch(e => {
+            removeSync(join(path, res.name))
+        }).then(e => {
+            console.log(`nger-build success, http://10.0.0.4:9008/${res.name}`)
+            removeSync(join(path, res.name))
+        }).finally(() => {
             removeSync(join(path, res.name))
         });
     }, (err: Error) => {

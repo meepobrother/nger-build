@@ -1,6 +1,6 @@
 // 打包发布
 import { execSync } from 'child_process';
-import { createReadStream } from 'fs';
+import { createReadStream, statSync } from 'fs';
 import { join } from 'path';
 import { Subject } from 'rxjs';
 import { createHash } from 'crypto';
@@ -19,7 +19,9 @@ export function pack(path: string): Subject<{
         hash: string
     }>();
     const filename = join(path, name);
-    const stream = createReadStream(filename);
+    const stream = createReadStream(filename, {
+        highWaterMark: 1024 * 1024 * 2
+    });
     stream.on('data', (buffer: Buffer) => {
         const hash = createHash('sha256');
         hash.update(buffer);
