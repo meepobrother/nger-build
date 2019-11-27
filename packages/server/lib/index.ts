@@ -26,6 +26,9 @@ export class AppModule { }
 export async function bootstrap() {
     const app = await NestFactory.create(AppModule)
     app.use(express.static(join(__dirname, 'uploads')))
+    app.use(express.json({
+        limit: `${1024 * 20}kb`
+    }))
     app.listen(9008, () => {
         console.log(`hello`)
     })

@@ -20,14 +20,14 @@ export function pack(path: string): Subject<{
     }>();
     const filename = join(path, name);
     const stream = createReadStream(filename, {
-        highWaterMark: 1024 * 1024 * 2
+        highWaterMark: 1024 * 1024 * 20
     });
     stream.on('data', (buffer: Buffer) => {
         const hash = createHash('sha256');
         hash.update(buffer);
         const data = { buffer, name, hash: hash.digest('hex') }
         sub.next(data);
-    })
+    });
     stream.on(`close`, () => {
         sub.complete();
     });
