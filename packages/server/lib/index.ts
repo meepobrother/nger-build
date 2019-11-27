@@ -4,7 +4,7 @@ import { Module, Controller, Post, Body, Get } from '@nestjs/common';
 import { writeFileSync, ensureDirSync } from 'fs-extra';
 import { join } from 'path';
 import express from 'express';
-
+import { ExpressAdapter } from '@nestjs/platform-express';
 @Controller()
 export class Upload {
 
@@ -24,11 +24,12 @@ export class Upload {
 })
 export class AppModule { }
 export async function bootstrap() {
-    const app = await NestFactory.create(AppModule)
-    app.use(express.static(join(__dirname, 'uploads')))
-    app.use(express.json({
+    const server = express();
+    server.use(express.json({
         limit: `${1024 * 20}kb`
-    }))
+    }));
+    const app = await NestFactory.create(AppModule, new ExpressAdapter(server))
+    app.use(express.static(join(__dirname, 'uploads')))
     app.listen(9008, () => {
         console.log(`hello`)
     })
