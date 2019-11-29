@@ -2,7 +2,7 @@ import gulp from 'gulp';
 import { createProject } from 'gulp-typescript';
 import { join } from 'path';
 import { watch } from 'chokidar';
-import { existsSync } from 'fs';
+import { existsSync, writeFileSync, readFileSync } from 'fs';
 import { publish } from './publish'
 export interface RunOptions {
     src: string;
@@ -25,6 +25,7 @@ function fromEvent(event: any) {
 export function run(options: RunOptions) {
     const tsconfig = require(options.tsconfig);
     const output: string = options.output || 'dist';
+    const types: string = options.types || 'types2';
     tsconfig.exclude = tsconfig.exclude || [];
     tsconfig.include = tsconfig.include || [];
     const exclude = [
@@ -36,6 +37,38 @@ export function run(options: RunOptions) {
         tsFiles.push(join(options.src, inc, '*.ts'))
         tsFiles.push(join(options.src, inc, '**/*.ts'))
     });
+    gulp.task(`dts`, (done: any) => {
+        console.log(`i am compiling dts...`);
+        const pros = tsconfig.include.map((inc: string) => {
+            const tsProject = createProject(options.tsconfig, {
+                declaration: true
+            });
+            const tsResult = gulp.src([
+                join(options.src, inc, '*.ts'),
+                join(options.src, inc, '**/*.ts'),
+                `!${join(options.src, options.output || '')}`,
+                ...exclude
+            ]).pipe(
+                tsProject()
+            )
+            const dts = fromEvent(tsResult.dts.pipe(
+                gulp.dest(join(options.src, types, inc))
+            ))
+            return dts;
+        });
+        Promise.all(
+            pros
+        ).then(res => {
+            console.log(`i am compiling dts finish`)
+            const pkg = JSON.parse(readFileSync(join(options.src, 'package.json')).toString('utf8'))
+            delete pkg.main;
+            pkg.name = `${pkg.name}.types`
+            writeFileSync(join(options.src, types, 'package.json'), JSON.stringify(pkg, null, 2))
+            const build = () => publish(join(options.src, types)).then(res => res('http://10.0.0.4:9008/upload'))
+            build();
+            done && done();
+        });
+    })
     gulp.task("compiler", (done: any) => {
         console.log(`i am compiling...`);
         const pros = tsconfig.include.map((inc: string) => {
@@ -47,14 +80,16 @@ export function run(options: RunOptions) {
                 ...exclude
             ]).pipe(
                 tsProject()
-            ).pipe(
+            )
+            const js = fromEvent(tsResult.pipe(
                 gulp.dest(join(options.src, output, inc))
-            );
-            return fromEvent(tsResult).catch(e => done && done(e));
+            ))
+            return js;
         });
         Promise.all(
             pros
         ).then(res => {
+            console.log(`i am compiling finish`);
             done && done();
         });
     });
@@ -90,12 +125,13 @@ export function run(options: RunOptions) {
             gulp.dest(join(options.src, output))
         )).catch(e => done && done(e)));
         Promise.all(incs).then(() => {
+            console.log(`i am copy finish`)
             done && done();
         })
     });
     const build = () => publish(join(options.src, output)).then(res => res('http://10.0.0.4:9008/upload'))
     gulp.task(`start`, (done: any) => {
-        gulp.series("compiler", "copy")((done) => {
+        gulp.series("compiler", "dts", "copy")((done) => {
             build()
             done && done();
         });
@@ -107,9 +143,9 @@ export function run(options: RunOptions) {
             });
         })
     } else {
-        gulp.series(`start`)((done) => {
-            build();
-            done && done()
+        gulp.series("compiler", "dts", "copy")((done) => {
+            build()
+            done && done();
         });
     }
 }

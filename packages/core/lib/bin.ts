@@ -15,10 +15,12 @@ const defaultConfig = findConfigFile(process.cwd(), (file: string) => {
     return existsSync(file);
 }) || join(process.cwd(), 'tsconfig.json')
 const output = join(program.output || 'dist', packageJson.name);
+const types = join(program.types || 'types', packageJson.name);
+
 let options: RunOptions = {
     src: process.cwd(),
     output: output,
-    types: output,
+    types: types,
     tsconfig: defaultConfig,
     watch: !!program.watch,
     name: packageJson.name
