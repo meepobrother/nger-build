@@ -1,22 +1,84 @@
 #!/usr/bin/env node
 import { NestFactory } from '@nestjs/core';
-import { Module, Controller, Post, Body, Get } from '@nestjs/common';
-import { writeFileSync, ensureDirSync } from 'fs-extra';
-import { join } from 'path';
-import express from 'express';
+import { Module, Controller, Post, Body, Get, Param, Res } from '@nestjs/common';
+import { Response } from 'express';
+import * as path from 'path';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import { readdirSync, ensureDirSync, writeFileSync } from 'fs-extra';
+import express from 'express';
+
+export class Version {
+    main: number;
+    second: number;
+    third: number;
+    constructor(val: string) {
+        const [main, second, third] = val.split('.');
+        this.main = parseInt(main)
+        this.second = parseInt(second)
+        this.third = parseInt(third)
+    }
+
+    static comString(v1: string, v2: string): number {
+        return this.com(new Version(v1), new Version(v2))
+    }
+
+    static com(v1: Version, v2: Version): number {
+        if (v1.main > v2.main) {
+            return 1;
+        }
+        if (v1.second > v2.second) {
+            return 1;
+        }
+        if (v1.third > v2.third) {
+            return 1;
+        }
+        return -1;
+    }
+
+}
+
 @Controller()
 export class Upload {
+    parseFileName(file: string): { name: string, version: string } {
+        const ext = path.extname(file);
+        file = file.replace(ext, '');
+        const files = file.split('-');
+        let version = files.pop() as string;
+        const fileName = files.join('-');
+        return {
+            name: fileName,
+            version: version
+        }
+    }
+    handler(file: string) {
+        const { name, version } = this.parseFileName(file);
+        if (version === 'latest') {
+            const files = readdirSync(path.join(__dirname, 'uploads'))
+                .filter(it => this.parseFileName(it).name === name)
+                .sort((a, b) => {
+                    return Version.comString(this.parseFileName(b).version, this.parseFileName(a).version)
+                });
+            if (files.length > 0) {
+                console.log(files[0])
+                return path.join(__dirname, 'uploads', files[0]);
+            }
+            throw new Error(`没找到文件`)
+        } else {
+            console.log(path.join(__dirname, file))
+            return path.join(__dirname, 'uploads', file)
+        }
+    }
 
-    @Get()
-    hello() {
-        return `welcome to use nger build!`
+    //
+    @Get(`/:file`)
+    getFile(@Param(`file`) file: string, @Res() res: Response) {
+        res.sendFile(this.handler(file))
     }
 
     @Post('upload')
     upload(@Body('data') data: Buffer, @Body('name') name: string) {
-        ensureDirSync(join(__dirname, 'uploads'));
-        writeFileSync(join(__dirname, 'uploads', name), Buffer.from(data))
+        ensureDirSync(path.join(__dirname, 'uploads'));
+        writeFileSync(path.join(__dirname, 'uploads', name), Buffer.from(data))
     }
 }
 @Module({
@@ -29,9 +91,9 @@ export async function bootstrap() {
         limit: `${1024 * 20}kb`
     }));
     const app = await NestFactory.create(AppModule, new ExpressAdapter(server))
-    app.use(express.static(join(__dirname, 'uploads')))
+    // app.use(express.static(path.join(__dirname, 'uploads')));
     app.listen(9008, () => {
         console.log(`hello`)
-    })
+    });
 }
 bootstrap();
