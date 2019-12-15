@@ -5,5 +5,6 @@ export interface RunOptions {
     types?: string;
     watch?: boolean;
     name?: string;
+    publish?: boolean;
 }
 export declare function run(options: RunOptions): void;

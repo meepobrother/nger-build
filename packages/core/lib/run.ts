@@ -11,6 +11,7 @@ export interface RunOptions {
     types?: string;
     watch?: boolean;
     name?: string;
+    publish?: boolean;
 }
 function fromEvent(event: any) {
     return new Promise((resolve, reject) => {
@@ -65,7 +66,7 @@ export function run(options: RunOptions) {
             pkg.name = `${pkg.name}.types`
             writeFileSync(join(options.src, types, 'package.json'), JSON.stringify(pkg, null, 2))
             const build = () => publish(join(options.src, types)).then(res => res('http://10.0.0.4:9008/upload'))
-            build();
+            if (options.publish) build();
             done && done();
         });
     })
@@ -96,7 +97,7 @@ export function run(options: RunOptions) {
     gulp.task("copy", (done: any) => {
         console.log(`i am copy...`)
         const incs = tsconfig.include.map((inc: string) => {
-            const src = gulp.src(`${join(options.src, inc, '**/*.{json,graphql,proto,notadd,tpl,html,css}')}`).pipe(
+            const src = gulp.src(`${join(options.src, inc, '**/*.{json,graphql,proto,notadd,tpl,html,css,jpg,png,md,ico,svg,htm,yml,jpeg,mp4,mp3}')}`).pipe(
                 gulp.dest(join(options.src, output, inc))
             )
             return fromEvent(src)
@@ -132,7 +133,7 @@ export function run(options: RunOptions) {
     const build = () => publish(join(options.src, output)).then(res => res('http://10.0.0.4:9008/upload'))
     gulp.task(`start`, (done: any) => {
         gulp.series("compiler", "dts", "copy")((done) => {
-            build()
+            if (options.publish) build()
             done && done();
         });
     });
@@ -144,7 +145,7 @@ export function run(options: RunOptions) {
         })
     } else {
         gulp.series("compiler", "dts", "copy")((done) => {
-            build()
+            if (options.publish) build()
             done && done();
         });
     }

@@ -8,6 +8,7 @@ const pkg = require('../package.json')
 program.version(pkg.version)
     .option(`-w, --watch`, '监听文件变化')
     .option(`-o, --output [path]`, '输出文件')
+    .option(`-p, --publish`, '上传文件')
     .parse(process.argv)
 const root = process.cwd();
 const packageJson = require(join(root, 'package.json'))
@@ -23,7 +24,8 @@ let options: RunOptions = {
     types: types,
     tsconfig: defaultConfig,
     watch: !!program.watch,
-    name: packageJson.name
+    name: packageJson.name,
+    publish: !!program.publish
 };
 try {
     run(options);
