@@ -2,6 +2,25 @@
 # yarn lockfile v1
 
 
+"@nger/build@^1.1.10":
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/@nger/build/-/build-1.1.10.tgz#eeced06896dda6b42a0c7503bcfe76ebbda60387"
+  integrity sha512-GVdO6faWphdXtN6f5tlNYZUUWXX5XHPn4uciESfgu/TIdIOzb3u9+ONihdrgIn8Dk/iS+CQwKi+f9U6dpIYCxg==
+  dependencies:
+    "@types/fs-extra" "^8.0.1"
+    axios "^0.19.0"
+    commander "^3.0.2"
+    fs-extra "^8.1.0"
+    gulp "^4.0.2"
+    gulp-concat "^2.6.1"
+    gulp-typescript "^5.0.1"
+    mocha "^6.2.1"
+    rxjs "^6.5.3"
+    tgz "^0.0.3"
+    ts-node "^8.4.1"
+    tsconfig-paths "^3.9.0"
+    typescript "^3.6.3"
+
 "@types/commander@^2.12.2":
   version "2.12.2"
   resolved "https://registry.yarnpkg.com/@types/commander/-/commander-2.12.2.tgz#183041a23842d4281478fa5d23c5ca78e6fd08ae"

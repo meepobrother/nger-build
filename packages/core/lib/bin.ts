@@ -16,13 +16,9 @@ const packageJson = require(join(root, 'package.json'))
 const defaultConfig = findConfigFile(process.cwd(), (file: string) => {
     return existsSync(file);
 }) || join(process.cwd(), 'tsconfig.json')
-const output = join(program.output || 'dist', packageJson.name);
-const types = join(program.types || 'types', packageJson.name);
+const output = join(root, program.output || 'dist', packageJson.name);
+const types = join(root, program.types || 'types', `${packageJson.name}.types`);
 const host = program.host || 'http://10.0.0.4:9008';
-console.log({
-    host,
-    output
-})
 let options: RunOptions = {
     src: process.cwd(),
     output: output,

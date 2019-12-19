@@ -1,6 +1,6 @@
 {
   "name": "@nger/build.types",
-  "version": "1.1.10",
+  "version": "1.1.42",
   "description": "> TODO: description",
   "author": "imeepos <1037483576@qq.com>",
   "homepage": "",
@@ -11,7 +11,8 @@
     "access": "public"
   },
   "bin": {
-    "nger-build": "./lib/bin.js"
+    "nger-build": "./lib/bin.js",
+    "nger-build-v2": "./lib/binv2.js"
   },
   "directories": {
     "lib": "lib",
@@ -22,7 +23,8 @@
   ],
   "scripts": {
     "ts": "ts-node -r tsconfig-paths/register",
-    "start": "yarn ts lib/build.ts"
+    "start": "yarn ts lib/build.ts",
+    "build": "nger-build"
   },
   "dependencies": {
     "@types/fs-extra": "^8.0.1",
@@ -40,8 +42,10 @@
     "typescript": "^3.6.3"
   },
   "devDependencies": {
+    "@nger/build": "^1.1.10",
     "@types/commander": "^2.12.2",
     "@types/gulp": "^4.0.6",
     "@types/mocha": "^5.2.7"
-  }
+  },
+  "main": "lib/index.d.ts"
 }
