@@ -27,11 +27,6 @@ function fromEvent(event: any) {
 }
 export function run(options: RunOptions) {
     const pkg = JSON.parse(readFileSync(join(options.src, 'package.json')).toString('utf8'))
-    // 版本号自动加1
-    const versions = pkg.version.split('.');
-    const lastVersion = parseInt(versions.pop()) + 1;
-    pkg.version = [...versions, lastVersion].join('.');
-    writeFileSync(join(options.src, 'package.json'), JSON.stringify(pkg, null, 2));
     const tsconfig = require(options.tsconfig);
     tsconfig.exclude = tsconfig.exclude || [];
     tsconfig.include = tsconfig.include || [];
