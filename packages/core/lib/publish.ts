@@ -2,7 +2,7 @@ import { pack } from './pack';
 import axios from 'axios';
 import { removeSync } from 'fs-extra';
 import { join } from 'path';
-export async function publish(path: string) {
+export async function publish(path: string, host?: string) {
     const sub = pack(path);
     return (url: string) => sub.subscribe(res => {
         axios.post(url, {
@@ -12,7 +12,7 @@ export async function publish(path: string) {
         }).catch(e => {
             removeSync(join(path, res.name))
         }).then(e => {
-            console.log(`nger-build success, http://10.0.0.4:9008/${res.name}`)
+            console.log(`nger-build success, ${host?host:""}/${res.name}`)
             removeSync(join(path, res.name))
         }).finally(() => {
             removeSync(join(path, res.name))

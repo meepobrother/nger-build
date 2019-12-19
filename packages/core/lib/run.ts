@@ -12,6 +12,7 @@ export interface RunOptions {
     watch?: boolean;
     name?: string;
     publish?: boolean;
+    host?: string;
 }
 function fromEvent(event: any) {
     return new Promise((resolve, reject) => {
@@ -65,7 +66,7 @@ export function run(options: RunOptions) {
             delete pkg.main;
             pkg.name = `${pkg.name}.types`
             writeFileSync(join(options.src, types, 'package.json'), JSON.stringify(pkg, null, 2))
-            const build = () => publish(join(options.src, types)).then(res => res('http://10.0.0.4:9008/upload'))
+            const build = () => publish(join(options.src, types),options.host).then(res => res(`${options.host}/upload`))
             if (options.publish) build();
             done && done();
         });
