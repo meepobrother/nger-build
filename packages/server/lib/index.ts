@@ -17,26 +17,24 @@ export class Version {
         this.second = parseInt(second)
         this.third = parseInt(third)
     }
-
+    // 1.1.0 1.0.9
     static comString(v1: string, v2: string): number {
         return this.com(new Version(v1), new Version(v2))
     }
-
+    //1.0.9 1.1.0 
     static com(v1: Version, v2: Version): number {
-        if (v1.main > v2.main) {
+        if (v1.main < v2.main) {
             return 1;
         }
-        if (v1.second > v2.second) {
+        if (v1.second < v2.second) {
             return 1;
         }
-        if (v1.third > v2.third) {
+        if (v1.third < v2.third) {
             return 1;
         }
         return -1;
     }
-
 }
-
 @Controller()
 export class Upload {
     parseFileName(file: string): { name: string, version: string } {
@@ -57,19 +55,16 @@ export class Upload {
                 .filter(it => this.parseFileName(it).name === name)
                 .sort((a, b) => {
                     return Version.comString(this.parseFileName(b).version, this.parseFileName(a).version)
-                });
+                }).reverse();
             if (files.length > 0) {
-                console.log(files[0])
                 return path.join(__dirname, 'uploads', files[0]);
             }
             throw new Error(`没找到文件`)
         } else {
-            console.log(path.join(__dirname, file))
             return path.join(__dirname, 'uploads', file)
         }
     }
 
-    //
     @Get(`/:file`)
     getFile(@Param(`file`) file: string, @Res() res: Response) {
         res.sendFile(this.handler(file))
@@ -81,6 +76,7 @@ export class Upload {
         writeFileSync(path.join(__dirname, 'uploads', name), Buffer.from(data))
     }
 }
+
 @Module({
     controllers: [Upload]
 })
